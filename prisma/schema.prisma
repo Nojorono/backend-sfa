@@ -10,22 +10,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum PermissionType {
+  View
+  Create
+  Update
+  Delete
+  Manage
+}
+
 model Users {
-  id              Int       @id @default(autoincrement())
-  email           String    @unique
-  username        String?   @unique
-  nik             String?   @unique
-  password        String?
-  first_name      String?
-  last_name       String?
-  profile_picture String?
-  is_verified     Boolean   @default(false)
-  phone           String?
-  role            Roles     @relation(fields: [role_id], references: [id])
-  role_id         Int
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
-  deleted_at      DateTime?
+  id          Int       @id @default(autoincrement())
+  email       String    @unique
+  username    String?   @unique
+  employee_id String?   @unique
+  password    String?
+  picture     String?
+  join_date   DateTime?
+  is_active   Boolean   @default(true)
+  valid_from  DateTime  @default(now())
+  valid_to    DateTime?
+  role        Roles     @relation(fields: [role_id], references: [id])
+  role_id     Int
+  created_at  DateTime  @default(now())
+  created_by  String?
+  updated_at  DateTime  @updatedAt
+  updated_by  String?
+  deleted_at  DateTime?
 
   @@map("users")
 }
@@ -70,12 +80,4 @@ model Menus {
   permissions Permissions[]
 
   @@map("menus")
-}
-
-enum PermissionType {
-  View
-  Create
-  Update
-  Delete
-  Manage
 }

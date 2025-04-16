@@ -1,4 +1,11 @@
-import { Body, Controller, Get, Param, Put } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Param,
+  Put,
+} from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { UpdateUserDto } from '../dtos/update.user.dto';
 import { IAuthPayload } from 'src/modules/auth/interfaces/auth.interface';
@@ -28,10 +35,14 @@ export class UserController {
   @Put(':id')
   @Serialize(UserResponseDto)
   updateUser(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() data: UpdateUserDto,
   ): Promise<UserResponseDto> {
-    return this.userService.updateUser(id, data);
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+    return this.userService.updateUser(numericId, data);
   }
 
   @ApiBearerAuth('accessToken')

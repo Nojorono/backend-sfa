@@ -18,7 +18,7 @@ export class RolesService {
     const { name, description } = data;
     return await this.prismaService.roles.update({
       data: {
-        name,
+        name: name?.toUpperCase(),
         description,
       },
       where: {
@@ -30,7 +30,7 @@ export class RolesService {
   async createRoles(data: CreateRolesDto): Promise<RolesResponseDto> {
     return this.prismaService.roles.create({
       data: {
-        name: data?.name,
+        name: data?.name?.toUpperCase(),
         description: data?.description,
       },
     });
@@ -43,23 +43,6 @@ export class RolesService {
   async getRolesById(roleId: number): Promise<RolesResponseDto> {
     return this.prismaService.roles.findUnique({ where: { id: roleId } });
   }
-
-  //   async softDeleteRoles(roleIds: number[]): Promise<GenericResponseDto> {
-  //     await this.prismaService.roles.updateMany({
-  //       where: {
-  //         id: {
-  //           in: roleIds,
-  //         },
-  //       },
-  //       data: {
-  //         deleted_at: new Date(),
-  //       },
-  //     });
-  //     return {
-  //       status: true,
-  //       message: 'roleDeleted',
-  //     };
-  //   }
 
   async deleteRoles(roleIds: number[]): Promise<GenericResponseDto> {
     await this.prismaService.roles.deleteMany({

@@ -30,14 +30,14 @@ export class UserSeeder {
       // Create SuperAdmin role
       console.log('Checking for SuperAdmin role...');
       const superAdminRole = await this.prisma.roles.findUnique({
-        where: { name: 'SuperAdmin' },
+        where: { name: 'SUPERADMIN' },
       });
 
       if (!superAdminRole) {
         console.log('Creating SuperAdmin role...');
         const role = await this.prisma.roles.create({
           data: {
-            name: 'SuperAdmin',
+            name: 'SUPERADMIN',
             description: 'System super administrator with full access',
           },
         });
@@ -100,13 +100,16 @@ export class UserSeeder {
           data: {
             email: 'superadmin@example.com',
             password: hashedPassword,
-            first_name: 'Super',
-            last_name: 'Admin',
             username: 'superadmin',
             role: {
               connect: { name: 'SuperAdmin' },
             },
-            is_verified: true,
+            is_active: true,
+            employee_id: 'superadmin',
+            picture: 'https://example.com/superadmin.png',
+            valid_from: new Date(),
+            created_by: 'superadmin',
+            updated_by: 'superadmin',
           },
         });
         console.log('SuperAdmin user created with ID:', user.id);
