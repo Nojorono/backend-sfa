@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  username        String?   @unique
+  nik             String?   @unique
+  password        String?
+  first_name      String?
+  last_name       String?
+  profile_picture String?
+  is_verified     Boolean   @default(false)
+  phone           String?
+  role            Roles     @relation(fields: [role_id], references: [id])
+  role_id         Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  deleted_at      DateTime?
+
+  @@map("users")
+}
+
+model Roles {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  description String?
+  permissions Permissions[]
+  users       Users[]
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+
+  @@map("roles")
+}
+
+model Permissions {
+  id              Int            @id @default(autoincrement())
+  role            Roles          @relation(fields: [role_id], references: [id])
+  role_id         Int
+  menu            Menus          @relation(fields: [menu_id], references: [id])
+  menu_id         Int
+  permission_type PermissionType
+  created_at      DateTime       @default(now())
+  updated_at      DateTime       @updatedAt
+
+  @@map("permissions")
+}
+
+model Menus {
+  id         Int      @id @default(autoincrement())
+  name       String
+  path       String   @unique
+  icon       String?
+  parent_id  Int?
+  order      Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  parent      Menus?        @relation("MenuHierarchy", fields: [parent_id], references: [id])
+  children    Menus[]       @relation("MenuHierarchy")
+  permissions Permissions[]
+
+  @@map("menus")
+}
+
+enum PermissionType {
+  View
+  Create
+  Update
+  Delete
+  Manage
+}
