@@ -16,4 +16,18 @@ export class UserLoginDto {
   @IsString()
   @IsNotEmpty({ message: 'password not provided' })
   public password: string;
+
+  @ApiProperty({
+    example: faker.internet.ip(),
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'ip_address not provided' })
+  public ip_address: string;
+
+  @ApiProperty({
+    example: faker.internet.mac(),
+  })
+  @IsString()
+  @IsNotEmpty({ message: 'device_info not provided' })
+  public device_info: string;
 }

@@ -23,8 +23,10 @@ model Users {
   email       String    @unique
   username    String?   @unique
   employee_id String?   @unique
+  user_uuid   String?   @unique
   password    String?
   picture     String?
+  phone       String?
   join_date   DateTime?
   is_active   Boolean   @default(true)
   valid_from  DateTime  @default(now())
@@ -36,6 +38,7 @@ model Users {
   updated_at  DateTime  @updatedAt
   updated_by  String?
   deleted_at  DateTime?
+  last_login  DateTime?
 
   @@map("users")
 }
@@ -80,4 +83,24 @@ model Menus {
   permissions Permissions[]
 
   @@map("menus")
+}
+
+model Customers {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(255)
+  alias      String?   @db.VarChar(255)
+  category   String?   @db.VarChar(100)
+  owner      String?   @db.VarChar(255)
+  phone      String?   @db.VarChar(50)
+  npwp       String?   @db.VarChar(50)
+  ktp        String?   @db.VarChar(50)
+  route_id   Int?      @db.Integer
+  is_active  Boolean   @default(true)
+  created_by String    @db.VarChar(50)
+  created_at DateTime  @default(now())
+  updated_by String    @db.VarChar(50)
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+
+  @@map("customers")
 }

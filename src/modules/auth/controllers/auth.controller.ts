@@ -10,7 +10,6 @@ import { TransformMessagePayload } from 'src/decorators/payload.decorator';
 import { AuthUser } from 'src/decorators/auth.decorator';
 import { AuthResponseDto } from '../dtos/auth.response.dto';
 import { Serialize } from 'src/decorators/serialize.decorator';
-
 @ApiTags('auth')
 @Controller({
   version: '1',

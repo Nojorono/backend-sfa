@@ -26,6 +26,13 @@ export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
   @ApiBearerAuth('accessToken')
+  @Get('parent')
+  @Serialize(MenuResponseDto)
+  getMenusByParent(): Promise<MenuResponseDto[]> {
+    return this.menuService.getMenusByParent();
+  }
+
+  @ApiBearerAuth('accessToken')
   @Get()
   @Serialize(MenuResponseDto)
   getMenus(): Promise<MenuResponseDto[]> {

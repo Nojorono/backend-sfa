@@ -21,7 +21,7 @@ export class MenuService {
         name,
         path,
         icon,
-        parent_id,
+        parent_id: parent_id || null,
         order,
       },
       where: {
@@ -36,7 +36,7 @@ export class MenuService {
         name: data?.name,
         path: data?.path,
         icon: data?.icon,
-        parent_id: data?.parent_id,
+        parent_id: data?.parent_id || null,
         order: data?.order,
       },
     });
@@ -45,7 +45,7 @@ export class MenuService {
   async getMenus(): Promise<MenuResponseDto[]> {
     return this.prismaService.menus.findMany({
       include: {
-        parent: true,
+        // parent: true,
         children: true,
       },
     });
@@ -84,5 +84,13 @@ export class MenuService {
       status: true,
       message: 'menuDeleted',
     };
+  }
+
+  async getMenusByParent(): Promise<MenuResponseDto[]> {
+    return this.prismaService.menus.findMany({
+      where: {
+        parent_id: null,
+      },
+    });
   }
 }

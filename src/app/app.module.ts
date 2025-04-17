@@ -15,9 +15,11 @@ import { PermissionsGuard } from 'src/guards/permission.guard';
 import { RolesModule } from 'src/modules/roles/roles.module';
 import { MenuModule } from 'src/modules/menu/menu.module';
 import { PermissionModule } from 'src/modules/permission/permission.module';
+import { AuthModule } from 'src/modules/auth/auth.module';
 
 @Module({
   imports: [
+    AuthModule,
     CommonModule,
     UserModule,
     MenuModule,

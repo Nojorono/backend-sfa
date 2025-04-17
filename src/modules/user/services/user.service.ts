@@ -5,6 +5,7 @@ import { UserResponseDto } from '../dtos/user.response.dto';
 import { GenericResponseDto } from '../../../dtos/generic.response.dto';
 import { CreateUserDto } from '../dtos/create.user.dto';
 import { HelperHashService } from 'src/modules/auth/services/helper.hash.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -36,11 +37,13 @@ export class UserService {
   }
 
   async createUser(data: CreateUserDto): Promise<UserResponseDto> {
+    const userUuid = uuidv4(); // Generate a UUID
     const hashedPassword = await this.helperHashService.createHash(
       data.password,
     );
     return this.prismaService.users.create({
       data: {
+        user_uuid: userUuid,
         role_id: data?.role_id,
         email: data?.email,
         password: hashedPassword,
