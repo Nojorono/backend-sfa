@@ -148,10 +148,24 @@ export class AuthService implements IAuthService {
         },
       });
 
+      const roleWithMenus = await this.prismaService.roles.findUnique({
+        where: { id: user.role_id },
+        include: {
+          permissions: {
+            include: {
+              menu: true,
+            },
+          },
+        },
+      });
+
+      const menus = roleWithMenus.permissions.map((perm) => perm.menu);
+
       return {
         accessToken,
         refreshToken,
         user,
+        menus,
       };
     } catch (e) {
       throw e;
