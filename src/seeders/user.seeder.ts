@@ -102,7 +102,7 @@ export class UserSeeder {
             password: hashedPassword,
             username: 'superadmin',
             role: {
-              connect: { name: 'SuperAdmin' },
+              connect: { name: 'SUPERADMIN' },
             },
             is_active: true,
             employee_id: 'superadmin',
