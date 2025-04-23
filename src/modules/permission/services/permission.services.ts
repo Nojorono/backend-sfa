@@ -6,6 +6,7 @@ import {
   UpdatePermissionDto,
 } from '../dtos/permission.dtos';
 import { GenericResponseDto } from 'src/dtos/generic.response.dto';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class PermissionsService {
@@ -37,6 +38,18 @@ export class PermissionsService {
         menu_id: data?.menu_id,
         permission_type: data?.permission_type,
       },
+    });
+  }
+
+  async createPermissionsMany(
+    data: CreatePermissionDto[],
+  ): Promise<Prisma.BatchPayload> {
+    return this.prismaService.permissions.createMany({
+      data: data.map((item) => ({
+        role_id: item?.role_id,
+        menu_id: item?.menu_id,
+        permission_type: item?.permission_type,
+      })),
     });
   }
 
@@ -78,19 +91,15 @@ export class PermissionsService {
   //     };
   //   }
 
-  async deletePermissions(
-    permissionIds: number[],
-  ): Promise<GenericResponseDto> {
-    await this.prismaService.permissions.deleteMany({
+  async deletePermissions(permissionIds: number): Promise<GenericResponseDto> {
+    await this.prismaService.permissions.delete({
       where: {
-        id: {
-          in: permissionIds,
-        },
+        id: permissionIds,
       },
     });
     return {
       status: true,
-      message: 'userDeleted',
+      message: 'permissionDeleted',
     };
   }
 }

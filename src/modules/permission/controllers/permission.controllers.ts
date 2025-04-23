@@ -16,6 +16,8 @@ import {
 } from '../dtos/permission.dtos';
 import { GenericResponseDto } from 'src/dtos/generic.response.dto';
 import { PermissionsService } from '../services/permission.services';
+import { Prisma } from '@prisma/client';
+import { ApiBody } from '@nestjs/swagger';
 
 @ApiTags('permissions')
 @Controller({
@@ -35,25 +37,25 @@ export class PermissionsController {
   @ApiBearerAuth('accessToken')
   @Get(':id')
   @Serialize(PermissionResponseDto)
-  getPermissionsById(@Param('id') id: number): Promise<PermissionResponseDto> {
-    return this.permissionService.getPermissionsById(id);
+  getPermissionsById(@Param('id') id: string): Promise<PermissionResponseDto> {
+    return this.permissionService.getPermissionsById(Number(id));
   }
 
   @ApiBearerAuth('accessToken')
   @Put(':id')
   @Serialize(PermissionResponseDto)
   updatePermissions(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() data: UpdatePermissionDto,
   ): Promise<PermissionResponseDto> {
-    return this.permissionService.updatePermissions(id, data);
+    return this.permissionService.updatePermissions(Number(id), data);
   }
 
   @ApiBearerAuth('accessToken')
   @Delete(':id')
   @Serialize(GenericResponseDto)
-  deletePermissions(@Param('id') id: number): Promise<GenericResponseDto> {
-    return this.permissionService.deletePermissions([id]);
+  deletePermissions(@Param('id') id: string): Promise<GenericResponseDto> {
+    return this.permissionService.deletePermissions(Number(id));
   }
 
   @ApiBearerAuth('accessToken')
@@ -63,5 +65,15 @@ export class PermissionsController {
     @Body() data: CreatePermissionDto,
   ): Promise<PermissionResponseDto> {
     return this.permissionService.createPermissions(data);
+  }
+
+  @ApiBearerAuth('accessToken')
+  @Post('createMany')
+  @ApiBody({ type: [CreatePermissionDto] })
+  @Serialize(PermissionResponseDto)
+  createPermissionsMany(
+    @Body() data: CreatePermissionDto[],
+  ): Promise<Prisma.BatchPayload> {
+    return this.permissionService.createPermissionsMany(data);
   }
 }

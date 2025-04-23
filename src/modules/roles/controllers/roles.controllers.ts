@@ -35,25 +35,25 @@ export class RolesController {
   @ApiBearerAuth('accessToken')
   @Get(':id')
   @Serialize(RolesResponseDto)
-  getRolesById(@Param('id') id: number): Promise<RolesResponseDto> {
-    return this.roleService.getRolesById(id);
+  getRolesById(@Param('id') id: string): Promise<RolesResponseDto> {
+    return this.roleService.getRolesById(Number(id));
   }
 
   @ApiBearerAuth('accessToken')
   @Put(':id')
   @Serialize(RolesResponseDto)
   updateRoles(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() data: UpdateRolesDto,
   ): Promise<RolesResponseDto> {
-    return this.roleService.updateRoles(id, data);
+    return this.roleService.updateRoles(Number(id), data);
   }
 
   @ApiBearerAuth('accessToken')
   @Delete(':id')
   @Serialize(GenericResponseDto)
-  deleteRoles(@Param('id') id: number): Promise<GenericResponseDto> {
-    return this.roleService.deleteRoles([id]);
+  deleteRoles(@Param('id') id: string): Promise<GenericResponseDto> {
+    return this.roleService.deleteRoles(Number(id));
   }
 
   @ApiBearerAuth('accessToken')

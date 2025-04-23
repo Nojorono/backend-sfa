@@ -44,17 +44,15 @@ export class RolesService {
     return this.prismaService.roles.findUnique({ where: { id: roleId } });
   }
 
-  async deleteRoles(roleIds: number[]): Promise<GenericResponseDto> {
-    await this.prismaService.roles.deleteMany({
+  async deleteRoles(roleId: number): Promise<GenericResponseDto> {
+    await this.prismaService.roles.delete({
       where: {
-        id: {
-          in: roleIds,
-        },
+        id: roleId,
       },
     });
     return {
       status: true,
-      message: 'userDeleted',
+      message: 'roleDeleted',
     };
   }
 }
