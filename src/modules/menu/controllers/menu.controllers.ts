@@ -42,25 +42,25 @@ export class MenuController {
   @ApiBearerAuth('accessToken')
   @Get(':id')
   @Serialize(MenuResponseDto)
-  getMenusById(@Param('id') id: number): Promise<MenuResponseDto> {
-    return this.menuService.getMenusById(id);
+  getMenusById(@Param('id') id: string): Promise<MenuResponseDto> {
+    return this.menuService.getMenusById(Number(id));
   }
 
   @ApiBearerAuth('accessToken')
   @Put(':id')
   @Serialize(MenuResponseDto)
   updateMenu(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() data: UpdateMenuDto,
   ): Promise<MenuResponseDto> {
-    return this.menuService.updateMenu(id, data);
+    return this.menuService.updateMenu(Number(id), data);
   }
 
   @ApiBearerAuth('accessToken')
   @Delete(':id')
   @Serialize(GenericResponseDto)
-  deleteMenu(@Param('id') id: number): Promise<GenericResponseDto> {
-    return this.menuService.deleteMenus([id]);
+  deleteMenu(@Param('id') id: string): Promise<GenericResponseDto> {
+    return this.menuService.deleteMenus(Number(id));
   }
 
   @ApiBearerAuth('accessToken')

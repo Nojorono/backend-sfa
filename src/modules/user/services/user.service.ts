@@ -6,6 +6,7 @@ import { GenericResponseDto } from '../../../dtos/generic.response.dto';
 import { CreateUserDto } from '../dtos/create.user.dto';
 import { HelperHashService } from 'src/modules/auth/services/helper.hash.service';
 import { v4 as uuidv4 } from 'uuid';
+import { UserQueryDto } from '../dtos/query.user.dto';
 
 @Injectable()
 export class UserService {
@@ -58,8 +59,41 @@ export class UserService {
     });
   }
 
-  async getUsers(): Promise<UserResponseDto[]> {
-    return this.prismaService.users.findMany();
+  async getUsers(query: UserQueryDto): Promise<UserResponseDto[]> {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = 'id',
+      sortOrder = 'desc',
+      search,
+      role,
+      is_active,
+    } = query;
+
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { email: { contains: search, mode: 'insensitive' } },
+        // add other searchable fields as needed
+      ];
+    }
+
+    if (role) {
+      where.role = role;
+    }
+
+    if (typeof is_active !== 'undefined') {
+      where.is_active = is_active === 'true';
+    }
+
+    return this.prismaService.users.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: { [sortBy]: sortOrder },
+    });
   }
 
   async getUserById(userId: number): Promise<UserResponseDto> {

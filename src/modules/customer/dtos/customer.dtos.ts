@@ -46,6 +46,11 @@ export class CreateCustomerDto {
   @IsOptional()
   @IsBoolean()
   is_active?: boolean;
+
+  @ApiProperty({ example: 'admin', required: false })
+  @IsOptional()
+  @IsString()
+  created_by?: string;
 }
 
 // Update DTO
@@ -94,6 +99,11 @@ export class UpdateCustomerDto {
   @IsOptional()
   @IsBoolean()
   is_active?: boolean;
+
+  @ApiProperty({ example: 'admin', required: false })
+  @IsOptional()
+  @IsString()
+  updated_by?: string;
 }
 
 // Response DTO

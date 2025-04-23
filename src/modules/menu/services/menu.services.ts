@@ -72,12 +72,16 @@ export class MenuService {
   //     };
   //   }
 
-  async deleteMenus(menuIds: number[]): Promise<GenericResponseDto> {
-    await this.prismaService.menus.deleteMany({
+  async deleteMenus(menuIds: number): Promise<GenericResponseDto> {
+    // First, delete all permissions related to this menu
+    await this.prismaService.permissions.deleteMany({
+      where: { menu_id: menuIds },
+    });
+
+    // Then, delete the menu
+    await this.prismaService.menus.delete({
       where: {
-        id: {
-          in: menuIds,
-        },
+        id: menuIds,
       },
     });
     return {
