@@ -43,12 +43,18 @@ export class MenuService {
   }
 
   async getMenus(): Promise<MenuResponseDto[]> {
-    return this.prismaService.menus.findMany({
+    // Fetch all menus with their children
+    const allMenus = await this.prismaService.menus.findMany({
       include: {
-        // parent: true,
         children: true,
       },
+      orderBy: {
+        order: 'asc',
+      },
     });
+
+    // Only return menus where parent_id is null (top-level), with their children
+    return allMenus.filter((menu) => menu.parent_id === null);
   }
 
   async getMenusById(menuId: number): Promise<MenuResponseDto> {
