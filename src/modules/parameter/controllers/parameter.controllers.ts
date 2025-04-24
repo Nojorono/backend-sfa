@@ -16,6 +16,7 @@ import {
 } from '../dtos/parameter.dtos';
 import { GenericResponseDto } from 'src/dtos/generic.response.dto';
 import { ParameterService } from '../services/parameter.services';
+import { Query } from '@nestjs/common';
 
 @ApiTags('parameter')
 @Controller({
@@ -28,8 +29,8 @@ export class ParameterController {
   @ApiBearerAuth('accessToken')
   @Get()
   @Serialize(ParameterResponseDto)
-  getParameters(): Promise<ParameterResponseDto[]> {
-    return this.parameterService.getParameters();
+  getParameters(@Query('key') key?: string): Promise<ParameterResponseDto[]> {
+    return this.parameterService.getParameters(key);
   }
 
   @ApiBearerAuth('accessToken')

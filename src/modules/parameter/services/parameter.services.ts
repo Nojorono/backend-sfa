@@ -45,8 +45,9 @@ export class ParameterService {
     });
   }
 
-  async getParameters(): Promise<ParameterResponseDto[]> {
+  async getParameters(key?: string): Promise<ParameterResponseDto[]> {
     return await this.prismaService.parameters.findMany({
+      where: key ? { key } : undefined,
       orderBy: {
         created_at: 'asc',
       },
@@ -58,23 +59,6 @@ export class ParameterService {
       where: { id: parameterId },
     });
   }
-
-  //   async softDeleteRoles(roleIds: number[]): Promise<GenericResponseDto> {
-  //     await this.prismaService.roles.updateMany({
-  //       where: {
-  //         id: {
-  //           in: roleIds,
-  //         },
-  //       },
-  //       data: {
-  //         deleted_at: new Date(),
-  //       },
-  //     });
-  //     return {
-  //       status: true,
-  //       message: 'roleDeleted',
-  //     };
-  //   }
 
   async deleteParameters(parameterIds: number): Promise<GenericResponseDto> {
     await this.prismaService.parameters.delete({
