@@ -17,7 +17,7 @@ import { MenuModule } from 'src/modules/menu/menu.module';
 import { PermissionModule } from 'src/modules/permission/permission.module';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { CustomerModule } from 'src/modules/customer/customer.module';
-
+import { ParameterModule } from 'src/modules/parameter/parameter.module';
 @Module({
   imports: [
     AuthModule,
@@ -27,6 +27,7 @@ import { CustomerModule } from 'src/modules/customer/customer.module';
     PermissionModule,
     RolesModule,
     CustomerModule,
+    ParameterModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     I18nModule.forRoot({
       fallbackLanguage: 'en',

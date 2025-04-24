@@ -104,3 +104,17 @@ model Customers {
 
   @@map("customers")
 }
+
+model Parameters {
+  id         Int      @id @default(autoincrement())
+  key        String   @db.VarChar(100)
+  value      String   @db.VarChar(255)
+  label      String   @db.VarChar(255)
+  is_active  Boolean  @default(true)
+  created_by String   @db.VarChar(50)
+  created_at DateTime @default(now())
+  updated_by String   @db.VarChar(50)
+  updated_at DateTime @updatedAt
+
+  @@map("parameters")
+}
