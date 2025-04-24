@@ -106,15 +106,39 @@ model Customers {
 }
 
 model Parameters {
-  id         Int      @id @default(autoincrement())
-  key        String   @db.VarChar(100)
-  value      String   @db.VarChar(255)
-  label      String   @db.VarChar(255)
-  is_active  Boolean  @default(true)
-  created_by String   @db.VarChar(50)
-  created_at DateTime @default(now())
-  updated_by String   @db.VarChar(50)
-  updated_at DateTime @updatedAt
+  id         Int       @id @default(autoincrement())
+  key        String    @db.VarChar(100)
+  value      String    @db.VarChar(255)
+  label      String    @db.VarChar(255)
+  is_active  Boolean   @default(true)
+  created_by String    @db.VarChar(50)
+  created_at DateTime  @default(now())
+  updated_by String    @db.VarChar(50)
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
 
   @@map("parameters")
+}
+
+model Branch {
+  id                BigInt    @id @default(autoincrement())
+  organization_code String    @db.VarChar(3)
+  organization_name String    @db.VarChar(250)
+  organization_id   Int
+  org_name          String    @db.VarChar(250)
+  org_id            String    @db.VarChar(150)
+  organization_type String    @db.VarChar(150)
+  region_code       String    @db.VarChar(150)
+  address           String    @db.Text
+  location_id       Int
+  valid_from        DateTime  @db.Date
+  valid_to          DateTime  @db.Date
+  is_active         Boolean   @default(true)
+  created_by        String    @db.VarChar(25)
+  created_at        DateTime  @default(now())
+  updated_by        String    @db.VarChar(25)
+  updated_at        DateTime  @updatedAt
+  deleted_at        DateTime?
+
+  @@map("branch")
 }
