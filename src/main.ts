@@ -77,6 +77,7 @@ async function bootstrap() {
       prefix: versioningPrefix,
     });
   }
+  // Authentication microservice
   app.connectMicroservice({
     transport: Transport.RMQ,
     options: {
@@ -84,6 +85,26 @@ async function bootstrap() {
       queue: `${configService.get('rmq.auth')}`,
       queueOptions: { durable: false },
       prefetchCount: 1,
+    },
+  });
+
+  // Customer microservice
+  app.connectMicroservice({
+    transport: Transport.RMQ,
+    options: {
+      urls: [`${configService.get('rmq.uri')}`],
+      queue: `${configService.get('rmq.customer')}`,
+      queueOptions: {
+        durable: false, // Keep this false to match existing queue configuration
+      },
+      noAck: true, // Disable acknowledgments to match existing queue configuration
+      persistent: false, // Match existing queue configuration
+      prefetchCount: 1, // Process one message at a time
+      // Connection management
+      socketOptions: {
+        heartbeatIntervalInSeconds: 5, // Keep connection alive with frequent heartbeats
+        reconnectTimeInSeconds: 5, // Reconnect quickly if connection drops
+      },
     },
   });
   setupSwagger(app);
