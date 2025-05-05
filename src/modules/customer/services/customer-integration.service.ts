@@ -60,36 +60,6 @@ export class CustomerIntegrationService implements OnModuleInit {
         );
 
         this.logger.log(`Ping response: ${JSON.stringify(pingResponse)}`);
-
-        // Also test echo to verify pattern routing
-        this.logger.log('Sending echo test to verify pattern routing...');
-        const echoTestData = {
-          test: 'echo-test',
-          timestamp: new Date().toISOString(),
-        };
-        const echoResponse = await firstValueFrom(
-          this.customerClient.send('echo', echoTestData).pipe(
-            timeout(5000), // 5 second timeout
-            catchError((error) => {
-              this.logger.warn(`Echo test timeout: ${error.message}`);
-              return of({ status: false, message: 'Echo test timeout' });
-            }),
-          ),
-        );
-
-        this.logger.log(`Echo response: ${JSON.stringify(echoResponse)}`);
-
-        if (pingResponse?.status && echoResponse?.status) {
-          this.connectionEstablished = true;
-          this.logger.log(
-            'Connection to RabbitMQ customer service verified successfully',
-          );
-          return;
-        } else {
-          throw new Error(
-            'Connection tests failed: Ping or Echo test unsuccessful',
-          );
-        }
       } catch (testError) {
         throw new Error(`Connection tests failed: ${testError.message}`);
       }
@@ -391,9 +361,11 @@ export class CustomerIntegrationService implements OnModuleInit {
 
       // Set default values if not provided
       const paginationParams: PaginationParamsDto = {
-        page: params?.page || 1,
-        limit: params?.limit || 10,
+        page: params?.page || undefined,
+        limit: params?.limit || undefined,
       };
+
+      console.log('paginationParams', paginationParams);
 
       this.logger.log(
         'Sending request to Oracle with params:',
@@ -406,7 +378,7 @@ export class CustomerIntegrationService implements OnModuleInit {
       );
 
       // Use longer timeout for first connection
-      const timeoutMs = this.connectionEstablished ? 20000 : 40000; // 20 seconds normally, 40 seconds for first connection
+      const timeoutMs = this.connectionEstablished ? 300000 : 300000; // 5 minutes for all requests
       this.logger.log(`Using timeout of ${timeoutMs}ms for RabbitMQ request`);
 
       const metaCustomersResponse = await firstValueFrom(
@@ -430,24 +402,32 @@ export class CustomerIntegrationService implements OnModuleInit {
           ),
       );
 
-      this.logger.log('Oracle response received:', {
-        status: metaCustomersResponse?.status || false,
-        count: metaCustomersResponse?.count || 0,
-        totalPages: metaCustomersResponse?.totalPages || 0,
-        currentPage: metaCustomersResponse?.currentPage || 0,
-        limit: metaCustomersResponse?.limit || 0,
-        dataLength: metaCustomersResponse?.data?.length || 0,
-        message: metaCustomersResponse?.message || 'No message',
+      // Log the response for debugging
+      this.logger.log('Received response from Oracle service:', {
+        status: metaCustomersResponse?.status,
+        count: metaCustomersResponse?.count,
+        dataLength: metaCustomersResponse?.data?.length,
+        message: metaCustomersResponse?.message,
       });
 
-      return (
-        metaCustomersResponse || {
-          data: [],
-          count: 0,
-          status: false,
-          message: 'Failed to retrieve data from Oracle (null response)',
-        }
-      );
+      // Ensure the response has the correct structure
+      const response: MetaCustomerResponseDto = {
+        data: metaCustomersResponse?.data || [],
+        count: metaCustomersResponse?.count || 0,
+        status: metaCustomersResponse?.status ?? false,
+        message:
+          metaCustomersResponse?.message ||
+          'No data received from Oracle service',
+      };
+
+      // Add pagination metadata if available
+      if (metaCustomersResponse?.currentPage !== undefined) {
+        response.currentPage = metaCustomersResponse.currentPage;
+        response.limit = metaCustomersResponse.limit;
+        response.totalPages = metaCustomersResponse.totalPages;
+      }
+
+      return response;
     } catch (error) {
       this.logger.error('Error getting Oracle customers:', error);
       // Reset connection status to force reconnection on next attempt
@@ -523,6 +503,70 @@ export class CustomerIntegrationService implements OnModuleInit {
         count: 0,
         status: false,
         message: `Error retrieving Oracle customer: ${error?.message || 'Unknown error'}`,
+      };
+    }
+  }
+
+  /**
+   * Invalidate customer cache in the meta service
+   * @param customerId Optional customer ID to invalidate specific customer cache
+   * If not provided, all customer caches will be invalidated
+   * @returns A promise that resolves to the status of the invalidation
+   */
+  async invalidateCustomerCache(
+    customerId?: number,
+  ): Promise<{ status: boolean; message: string }> {
+    try {
+      // Ensure connection before sending message
+      await this.ensureConnection();
+
+      this.logger.log(
+        `Sending request to invalidate customer cache ${customerId ? `for ID: ${customerId}` : '(all customers)'}`,
+      );
+
+      // Use default timeout for cache invalidation
+      const timeoutMs = 10000; // 10 seconds timeout for cache operations
+
+      // Send invalidation request
+      const response = await firstValueFrom(
+        this.customerClient
+          .send<{ status: boolean; message: string }>(
+            'invalidate_customer_cache',
+            {
+              customerId,
+            },
+          )
+          .pipe(
+            timeout(timeoutMs),
+            catchError((error) => {
+              this.logger.error(
+                `Cache invalidation request timeout after ${timeoutMs}ms: ${error.message || 'Unknown error'}`,
+              );
+              return of({
+                status: false,
+                message: `Cache invalidation request timed out after ${timeoutMs}ms: ${error.message || 'Unknown error'}`,
+              });
+            }),
+          ),
+      );
+
+      this.logger.log(
+        `Cache invalidation response: ${JSON.stringify(response)}`,
+      );
+      return (
+        response || {
+          status: false,
+          message: 'Failed to invalidate cache (null response)',
+        }
+      );
+    } catch (error) {
+      this.logger.error(
+        `Error invalidating customer cache ${customerId ? `for ID ${customerId}` : '(all customers)'}:`,
+        error,
+      );
+      return {
+        status: false,
+        message: `Error invalidating customer cache: ${error?.message || 'Unknown error'}`,
       };
     }
   }

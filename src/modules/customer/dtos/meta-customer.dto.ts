@@ -139,8 +139,8 @@ export class MetaCustomerDto {
 }
 
 export class PaginationParamsDto {
-  page?: number = 1;
-  limit?: number = 10;
+  page?: number;
+  limit?: number;
   search?: string;
 }
 

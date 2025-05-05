@@ -2,6 +2,7 @@ import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -29,15 +30,7 @@ export class CustomerIntegrationController {
     type: MergedCustomerResponseDto,
   })
   async getMergedCustomers(): Promise<MergedCustomerResponseDto> {
-    console.log('Getting merged customers...');
     const result = await this.customerIntegrationService.getMergedCustomers();
-    console.log('Merged customers result:', {
-      status: result.status,
-      count: result.count,
-      message: result.message,
-      dataCount: result.data?.length,
-      firstFewRecords: result.data?.slice(0, 2), // Show first two records for debugging
-    });
     return result;
   }
 
@@ -64,12 +57,22 @@ export class CustomerIntegrationController {
     description: 'Customer data from Oracle database only',
     type: MetaCustomerResponseDto,
   })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of items per page (default: 10)',
+  })
   async getOracleCustomers(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ): Promise<MetaCustomerResponseDto> {
-    console.log('Getting Oracle customers only with params:', { page, limit });
-
     const paginationParams: PaginationParamsDto = {
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
@@ -79,16 +82,6 @@ export class CustomerIntegrationController {
       await this.customerIntegrationService.getOracleCustomers(
         paginationParams,
       );
-
-    console.log('Oracle customers result:', {
-      status: result.status,
-      count: result.count,
-      totalPages: result.totalPages,
-      currentPage: result.currentPage,
-      message: result.message,
-      dataCount: result.data?.length,
-      firstFewRecords: result.data?.slice(0, 2), // Show first two records for debugging
-    });
 
     return result;
   }
