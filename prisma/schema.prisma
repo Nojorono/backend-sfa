@@ -86,16 +86,57 @@ model Menus {
 }
 
 model Customers {
-  id         Int       @id @default(autoincrement())
-  name       String    @db.VarChar(255)
-  alias      String?   @db.VarChar(255)
-  category   String?   @db.VarChar(100)
-  owner      String?   @db.VarChar(255)
-  phone      String?   @db.VarChar(50)
-  npwp       String?   @db.VarChar(50)
-  ktp        String?   @db.VarChar(50)
-  route_id   Int?      @db.Integer
-  is_active  Boolean   @default(true)
+  // Basic Information
+  id    Int     @id @default(autoincrement())
+  name  String  @db.VarChar(255)
+  alias String? @db.VarChar(255)
+  owner String? @db.VarChar(255)
+  phone String? @db.VarChar(50)
+  npwp  String? @db.VarChar(50)
+  ktp   String? @db.VarChar(50)
+
+  // Relations
+  addresses AddressCustomer[]
+
+  // Oracle Integration Fields
+  channel                String? @db.VarChar(100)
+  customer_number        String? @db.VarChar(100)
+  cust_account_id        Int?    @db.Integer
+  bill_to_location       String? @db.VarChar(255)
+  ship_to_location       String? @db.VarChar(255)
+  order_type_name        String? @db.VarChar(255)
+  order_type_id          String? @db.VarChar(50)
+  return_order_type_name String? @db.VarChar(255)
+  return_order_type_id   String? @db.VarChar(50)
+  site_type              String? @db.VarChar(50)
+  bill_to_site_use_id    Int?    @db.Integer
+  ship_to_site_use_id    Int?    @db.Integer
+
+  // Credit Information
+  credit_checking      String?  @db.VarChar(50)
+  credit_exposure      Decimal? @db.Decimal(20, 2)
+  overall_credit_limit Decimal? @db.Decimal(20, 2)
+  trx_credit_limit     Decimal? @db.Decimal(20, 2)
+
+  // Terms and Pricing
+  term_name       String? @db.VarChar(100)
+  term_id         Int?    @db.Integer
+  term_day        Int?    @db.Integer
+  price_list_name String? @db.VarChar(255)
+  price_list_id   Int?    @db.Integer
+
+  // Organization Information
+  organization_code String? @db.VarChar(50)
+  organization_name String? @db.VarChar(255)
+  organization_id   Int?    @db.Integer
+  org_name          String? @db.VarChar(255)
+  org_id            String? @db.VarChar(50)
+
+  // Routing
+  route_id  Int?    @db.Integer
+  is_active Boolean @default(true)
+
+  // Audit Fields
   created_by String    @db.VarChar(50)
   created_at DateTime  @default(now())
   updated_by String    @db.VarChar(50)
@@ -103,6 +144,25 @@ model Customers {
   deleted_at DateTime?
 
   @@map("customers")
+}
+
+model AddressCustomer {
+  id          Int       @id @default(autoincrement())
+  customer    Customers @relation(fields: [customer_id], references: [id])
+  customer_id Int
+  address1    String?   @db.VarChar(255)
+  provinsi    String?   @db.VarChar(100)
+  kab_kodya   String?   @db.VarChar(100)
+  kecamatan   String?   @db.VarChar(100)
+  kelurahan   String?   @db.VarChar(100)
+  kodepos     String?   @db.VarChar(10)
+  is_active   Boolean   @default(true)
+  created_by  String    @db.VarChar(25)
+  created_at  DateTime  @default(now())
+  updated_by  String    @db.VarChar(25)
+  updated_at  DateTime  @updatedAt
+
+  @@map("address_customer")
 }
 
 model Parameters {
