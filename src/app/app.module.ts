@@ -19,6 +19,7 @@ import { AuthModule } from 'src/modules/auth/auth.module';
 import { CustomerModule } from 'src/modules/customer/customer.module';
 import { ParameterModule } from 'src/modules/parameter/parameter.module';
 import { BranchModule } from 'src/modules/branch/branch.module';
+import { SchedulerModule } from 'src/common/scheduler/scheduler.module';
 @Module({
   imports: [
     AuthModule,
@@ -43,6 +44,7 @@ import { BranchModule } from 'src/modules/branch/branch.module';
       ],
     }),
     TerminusModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [
