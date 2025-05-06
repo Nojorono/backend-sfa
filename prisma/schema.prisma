@@ -111,6 +111,7 @@ model Customers {
   site_type              String? @db.VarChar(50)
   bill_to_site_use_id    Int?    @db.Integer
   ship_to_site_use_id    Int?    @db.Integer
+  site_use_id            String? @unique @db.VarChar(50) // site_use_id = customer_number + '/' + bill_to_site_use_id if CHANNEL RRO + id
 
   // Credit Information
   credit_checking      String? @db.VarChar(50)
@@ -133,8 +134,10 @@ model Customers {
   org_id            String? @db.VarChar(50)
 
   // Routing
-  route_id  Int?    @db.Integer
   is_active Boolean @default(true)
+
+  //flag stockist
+  is_stockist Boolean @default(false)
 
   // Audit Fields
   created_by String    @db.VarChar(50)
@@ -156,6 +159,8 @@ model AddressCustomer {
   kecamatan   String?   @db.VarChar(100)
   kelurahan   String?   @db.VarChar(100)
   kodepos     String?   @db.VarChar(10)
+  latitude    String?   @default("") @db.VarChar(50)
+  longitude   String?   @default("") @db.VarChar(50)
   is_active   Boolean   @default(true)
   created_by  String    @db.VarChar(25)
   created_at  DateTime  @default(now())

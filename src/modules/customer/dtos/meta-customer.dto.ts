@@ -39,18 +39,6 @@ export class MetaCustomerDto {
 
   @IsString()
   @IsOptional()
-  kab_kodya?: string;
-
-  @IsString()
-  @IsOptional()
-  kecamatan?: string;
-
-  @IsString()
-  @IsOptional()
-  kelurahan?: string;
-
-  @IsString()
-  @IsOptional()
   last_update_date?: string;
 
   @IsString()
@@ -95,10 +83,6 @@ export class MetaCustomerDto {
 
   @IsString()
   @IsOptional()
-  provinsi?: string;
-
-  @IsString()
-  @IsOptional()
   return_order_type_id?: string;
 
   @IsString()
@@ -136,12 +120,39 @@ export class MetaCustomerDto {
   @IsNumber()
   @IsOptional()
   trx_credit_limit?: number;
+
+  @IsString()
+  @IsOptional()
+  kab_kodya?: string;
+
+  @IsString()
+  @IsOptional()
+  kecamatan?: string;
+
+  @IsString()
+  @IsOptional()
+  kelurahan?: string;
+
+  @IsString()
+  @IsOptional()
+  provinsi?: string;
+
+  @IsString()
+  @IsOptional()
+  kodepos?: string;
 }
 
 export class PaginationParamsDto {
   page?: number;
   limit?: number;
   search?: string;
+}
+
+export class MetaCustomerDtoByDate {
+  data: MetaCustomerDto[];
+  count: number;
+  message?: string;
+  status?: boolean;
 }
 
 export class MetaCustomerResponseDto {

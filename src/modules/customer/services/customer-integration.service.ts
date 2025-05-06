@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import {
+  MetaCustomerDtoByDate,
   MetaCustomerResponseDto,
   PaginationParamsDto,
 } from '../dtos/meta-customer.dto';
@@ -234,6 +235,78 @@ export class CustomerIntegrationService implements OnModuleInit {
         count: 0,
         status: false,
         message: `Error retrieving Oracle customer: ${error?.message || 'Unknown error'}`,
+      };
+    }
+  }
+
+  /**
+   * Get customers from Oracle database only (no merging with local data)
+   */
+  async getOracleCustomersByDate(date: string): Promise<MetaCustomerDtoByDate> {
+    try {
+      // Ensure connection before sending message
+      await this.ensureConnection();
+
+      this.logger.log('Sending request to Oracle with params: ' + date);
+
+      // Add detailed logging
+      this.logger.log(
+        `Sending RabbitMQ message to pattern 'get_meta_customers_by_date' with payload: ${JSON.stringify(date)}`,
+      );
+
+      // Use longer timeout for first connection
+      const timeoutMs = this.connectionEstablished ? 300000 : 300000; // 5 minutes for all requests
+      this.logger.log(`Using timeout of ${timeoutMs}ms for RabbitMQ request`);
+
+      const metaCustomersResponse = await firstValueFrom(
+        this.customerClient
+          .send<MetaCustomerDtoByDate>('get_meta_customers_by_date', date)
+          .pipe(
+            timeout(timeoutMs),
+            catchError((error) => {
+              this.logger.error(
+                `RabbitMQ request timeout after ${timeoutMs}ms: ${error.message || 'Unknown error'}`,
+              );
+              // Reset connection status to force reconnection on next attempt
+              this.connectionEstablished = false;
+              return of({
+                data: [],
+                count: 0,
+                status: false,
+                message: `Request timed out after ${timeoutMs}ms: ${error.message || 'Unknown error'}`,
+              } as MetaCustomerDtoByDate);
+            }),
+          ),
+      );
+
+      // Log the response for debugging
+      this.logger.log('Received response from Oracle service:', {
+        status: metaCustomersResponse?.status,
+        count: metaCustomersResponse?.count,
+        dataLength: metaCustomersResponse?.data?.length,
+        message: metaCustomersResponse?.message,
+      });
+
+      // Ensure the response has the correct structure
+      const response: MetaCustomerDtoByDate = {
+        data: metaCustomersResponse?.data || [],
+        count: metaCustomersResponse?.count || 0,
+        status: metaCustomersResponse?.status ?? false,
+        message:
+          metaCustomersResponse?.message ||
+          'No data received from Oracle service',
+      };
+
+      return response;
+    } catch (error) {
+      this.logger.error('Error getting Oracle customers:', error);
+      // Reset connection status to force reconnection on next attempt
+      this.connectionEstablished = false;
+      return {
+        data: [],
+        count: 0,
+        status: false,
+        message: `Error retrieving Oracle customers: ${error?.message || 'Unknown error'}`,
       };
     }
   }

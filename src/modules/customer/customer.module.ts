@@ -7,7 +7,8 @@ import { CustomerIntegrationService } from './services/customer-integration.serv
 import { CustomerIntegrationController } from './controllers/customer-integration.controller';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
+import { ScheduleModule } from '@nestjs/schedule';
+import { CustomerSchedulerService } from './scheduler/customer.scheduler';
 @Module({
   controllers: [
     CustomerController,
@@ -41,8 +42,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         }),
       },
     ]),
+    ScheduleModule.forRoot(),
   ],
-  providers: [PrismaService, CustomerService, CustomerIntegrationService],
+  providers: [
+    PrismaService,
+    CustomerService,
+    CustomerIntegrationService,
+    CustomerSchedulerService,
+  ],
   exports: [CustomerService, CustomerIntegrationService],
 })
 export class CustomerModule {}
