@@ -10,21 +10,36 @@ export class UserSeeder {
     try {
       console.log('Starting seeding process...');
 
+      //clear data
+      // await this.prisma.permissions.deleteMany({});
+      // await this.prisma.menus.deleteMany({});
+      // await this.prisma.roles.deleteMany({});
+      // await this.prisma.users.deleteMany({});
+
       // Create default menu
       console.log('Creating default menu...');
       const defaultMenu = await this.prisma.menus.findUnique({
-        where: { path: '/default' },
+        where: { path: '/master' },
       });
 
       if (!defaultMenu) {
         const menu = await this.prisma.menus.create({
           data: {
-            name: 'Default',
-            path: '/default',
+            name: 'Master',
+            path: '/master',
             order: 0,
           },
         });
-        console.log('Default menu created with ID:', menu.id);
+        await this.prisma.menus.create({
+          data: {
+            name: 'Menu',
+            path: '/master_menu',
+            icon: 'menu',
+            parent_id: menu.id,
+            order: 1,
+          },
+        });
+        console.log('Default menu created with ID:', menu);
       }
 
       // Create SuperAdmin role
@@ -46,7 +61,7 @@ export class UserSeeder {
         // Create permissions for SuperAdmin role
         console.log('Creating permissions...');
         const defaultMenu = await this.prisma.menus.findUnique({
-          where: { path: '/default' },
+          where: { path: '/master_menu' },
         });
 
         const permissions = await this.prisma.permissions.createMany({
@@ -55,26 +70,6 @@ export class UserSeeder {
               role_id: role.id,
               menu_id: defaultMenu.id,
               permission_type: 'Manage',
-            },
-            {
-              role_id: role.id,
-              menu_id: defaultMenu.id,
-              permission_type: 'View',
-            },
-            {
-              role_id: role.id,
-              menu_id: defaultMenu.id,
-              permission_type: 'Create',
-            },
-            {
-              role_id: role.id,
-              menu_id: defaultMenu.id,
-              permission_type: 'Update',
-            },
-            {
-              role_id: role.id,
-              menu_id: defaultMenu.id,
-              permission_type: 'Delete',
             },
           ],
         });

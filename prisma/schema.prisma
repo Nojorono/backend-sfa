@@ -113,10 +113,10 @@ model Customers {
   ship_to_site_use_id    Int?    @db.Integer
 
   // Credit Information
-  credit_checking      String?  @db.VarChar(50)
-  credit_exposure      Decimal? @db.Decimal(20, 2)
-  overall_credit_limit Decimal? @db.Decimal(20, 2)
-  trx_credit_limit     Decimal? @db.Decimal(20, 2)
+  credit_checking      String? @db.VarChar(50)
+  credit_exposure      String? @default("0") @db.VarChar(50)
+  overall_credit_limit String? @default("0") @db.VarChar(50)
+  trx_credit_limit     String? @default("0") @db.VarChar(50)
 
   // Terms and Pricing
   term_name       String? @db.VarChar(100)

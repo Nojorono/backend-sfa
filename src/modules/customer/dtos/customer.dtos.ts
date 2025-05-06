@@ -1,5 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsInt, IsBoolean } from 'class-validator';
+import { AddressCustomer } from '@prisma/client';
+
+export class CustomerQueryDto {
+  page: number = 1;
+  limit: number = 10;
+  sortBy: string = 'id';
+  sortOrder: 'asc' | 'desc' = 'desc';
+  search?: string;
+  skip?: number;
+}
 
 // Create DTO
 export class CreateCustomerDto {
@@ -11,11 +21,6 @@ export class CreateCustomerDto {
   @IsOptional()
   @IsString()
   alias?: string;
-
-  @ApiProperty({ example: 'Retail', required: false })
-  @IsOptional()
-  @IsString()
-  category?: string;
 
   @ApiProperty({ example: 'John Doe', required: false })
   @IsOptional()
@@ -65,11 +70,6 @@ export class UpdateCustomerDto {
   @IsString()
   alias?: string;
 
-  @ApiProperty({ example: 'Retail', required: false })
-  @IsOptional()
-  @IsString()
-  category?: string;
-
   @ApiProperty({ example: 'John Doe', required: false })
   @IsOptional()
   @IsString()
@@ -106,47 +106,52 @@ export class UpdateCustomerDto {
   updated_by?: string;
 }
 
+export class CustomerResponseDtoPagination {
+  data: CustomerResponseDto[];
+  count: number;
+  totalPages?: number;
+  currentPage?: number;
+  limit?: number;
+  message?: string;
+  status?: boolean;
+}
+
 // Response DTO
 export class CustomerResponseDto {
-  @ApiProperty({ example: 1 })
   id: number;
-
-  @ApiProperty({ example: 'Customer Name' })
   name: string;
-
-  @ApiProperty({ example: 'Customer Alias', required: false })
   alias?: string;
-
-  @ApiProperty({ example: 'Retail', required: false })
-  category?: string;
-
-  @ApiProperty({ example: 'John Doe', required: false })
   owner?: string;
-
-  @ApiProperty({ example: '081234567890', required: false })
   phone?: string;
-
-  @ApiProperty({ example: '12.345.678.9-012.345', required: false })
   npwp?: string;
-
-  @ApiProperty({ example: '1234567890123456', required: false })
   ktp?: string;
-
-  @ApiProperty({ example: 1, required: false })
   route_id?: number;
-
-  @ApiProperty({ example: true })
+  credit_exposure?: string;
+  overall_credit_limit?: string;
+  trx_credit_limit?: string;
+  channel?: string;
+  customer_number?: string;
+  cust_account_id?: number;
+  bill_to_location?: string;
+  ship_to_location?: string;
+  bill_to_site_use_id?: number;
+  ship_to_site_use_id?: number;
+  credit_checking?: string;
+  term_name?: string;
+  term_id?: number;
+  term_day?: number;
+  price_list_name?: string;
+  price_list_id?: number;
+  organization_code?: string;
+  organization_name?: string;
+  organization_id?: number;
+  org_name?: string;
+  org_id?: string;
+  deleted_at?: Date;
   is_active: boolean;
-
-  @ApiProperty({ example: 'admin' })
   created_by: string;
-
-  @ApiProperty({ example: '2025-04-23T08:18:50.000Z' })
   created_at: Date;
-
-  @ApiProperty({ example: 'admin' })
   updated_by: string;
-
-  @ApiProperty({ example: '2025-04-23T08:18:50.000Z' })
   updated_at: Date;
+  addresses: AddressCustomer[];
 }

@@ -9,7 +9,7 @@ import {
 import { CustomerIntegrationService } from '../services/customer-integration.service';
 import {
   MetaCustomerResponseDto,
-  MergedCustomerResponseDto,
+  // MergedCustomerResponseDto,
   PaginationParamsDto,
 } from '../dtos/meta-customer.dto';
 
@@ -20,34 +20,34 @@ export class CustomerIntegrationController {
     private readonly customerIntegrationService: CustomerIntegrationService,
   ) {}
 
-  @ApiBearerAuth('accessToken')
-  @Get()
-  @ApiOperation({ summary: 'Get merged customers from both databases' })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Merged customer data from local PostgreSQL and Oracle databases',
-    type: MergedCustomerResponseDto,
-  })
-  async getMergedCustomers(): Promise<MergedCustomerResponseDto> {
-    const result = await this.customerIntegrationService.getMergedCustomers();
-    return result;
-  }
+  // @ApiBearerAuth('accessToken')
+  // @Get()
+  // @ApiOperation({ summary: 'Get merged customers from both databases' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description:
+  //     'Merged customer data from local PostgreSQL and Oracle databases',
+  //   type: MergedCustomerResponseDto,
+  // })
+  // async getMergedCustomers(): Promise<MergedCustomerResponseDto> {
+  //   const result = await this.customerIntegrationService.getMergedCustomers();
+  //   return result;
+  // }
 
-  @ApiBearerAuth('accessToken')
-  @Get(':id')
-  @ApiOperation({ summary: 'Get merged customer by ID' })
-  @ApiResponse({
-    status: 200,
-    description:
-      'Merged customer data from local PostgreSQL and Oracle databases',
-    type: MergedCustomerResponseDto,
-  })
-  async getMergedCustomerById(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<MergedCustomerResponseDto> {
-    return this.customerIntegrationService.getMergedCustomerById(id);
-  }
+  // @ApiBearerAuth('accessToken')
+  // @Get(':id')
+  // @ApiOperation({ summary: 'Get merged customer by ID' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description:
+  //     'Merged customer data from local PostgreSQL and Oracle databases',
+  //   type: MergedCustomerResponseDto,
+  // })
+  // async getMergedCustomerById(
+  //   @Param('id', ParseIntPipe) id: number,
+  // ): Promise<MergedCustomerResponseDto> {
+  //   return this.customerIntegrationService.getMergedCustomerById(id);
+  // }
 
   @ApiBearerAuth('accessToken')
   @Get('oracle/all')
