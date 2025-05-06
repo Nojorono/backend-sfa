@@ -1,11 +1,11 @@
 // src/common/scheduler/scheduler.service.ts
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { Cron, SchedulerRegistry } from '@nestjs/schedule';
+import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import * as crypto from 'crypto';
 import { CustomerService } from '../services/customer.services';
 import { CustomerIntegrationService } from '../services/customer-integration.service';
-import { MetaCustomerDto } from '../dtos/meta-customer.dto';
+// import { MetaCustomerDto } from '../dtos/meta-customer.dto';
 
 @Injectable()
 export class CustomerSchedulerService implements OnModuleInit {
@@ -22,39 +22,39 @@ export class CustomerSchedulerService implements OnModuleInit {
   }
 
   onModuleInit() {
-    this.logger.log('Scheduler service initialized');
+    this.logger.log('Scheduler customer service initialized');
   }
 
   // Run every 2 minutes
-  @Cron('*/3 * * * *')
-  async handleTest() {
-    const now = new Date();
-    const date = now.toISOString().split('T')[0];
-    this.logger.log(`[3-Minute Task] Running at ${now.toISOString()}`);
-    const result =
-      await this.customerMetaService.getOracleCustomersByDate(date);
-    const metaCustomers: MetaCustomerDto[] = result.data;
-    if (metaCustomers.length === 0) {
-      this.logger.log(`[3-Minute Task] No data found at ${date}`);
-      return;
-    }
-    metaCustomers.forEach((metaCustomer) => {
-      this.customerService.createOrUpdate(metaCustomer);
-    });
-    this.logger.log(`[3-Minute Task] Done at ${now.toISOString()}`);
-  }
+  // @Cron('*/3 * * * *')
+  // async handleTest() {
+  //   const now = new Date();
+  //   const date = now.toISOString().split('T')[0];
+  //   this.logger.log(`[3-Minute Task] Running at ${now.toISOString()}`);
+  //   const result =
+  //     await this.customerMetaService.getOracleCustomersByDate(date);
+  //   const metaCustomers: MetaCustomerDto[] = result.data;
+  //   if (metaCustomers.length === 0) {
+  //     this.logger.log(`[3-Minute Task] No data found at ${date}`);
+  //     return;
+  //   }
+  //   metaCustomers.forEach((metaCustomer) => {
+  //     this.customerService.createOrUpdate(metaCustomer);
+  //   });
+  //   this.logger.log(`[3-Minute Task] Done at ${now.toISOString()}`);
+  // }
 
-  // Example: Run every 30 minutes
-  @Cron('*/30 * * * *')
-  handleCron() {
-    this.logger.debug('Running scheduled task every 30 minutes');
-  }
+  // // Example: Run every 30 minutes
+  // @Cron('*/30 * * * *')
+  // handleCron() {
+  //   this.logger.debug('Running scheduled task every 30 minutes');
+  // }
 
-  // Example: Run at 2:30 AM every day
-  @Cron('30 2 * * *')
-  handleDailyTask() {
-    this.logger.log('Running daily task at 2:30 AM');
-  }
+  // // Example: Run at 2:30 AM every day
+  // @Cron('30 2 * * *')
+  // handleDailyTask() {
+  //   this.logger.log('Running daily task at 2:30 AM');
+  // }
 
   // Add dynamic cron job
   addCronJob(name: string, cronTime: string, callback: () => void) {
