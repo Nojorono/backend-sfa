@@ -3,12 +3,28 @@ import { IsOptional, IsString, IsInt, IsBoolean } from 'class-validator';
 import { AddressCustomer } from '@prisma/client';
 
 export class CustomerQueryDto {
-  page: number = 1;
-  limit: number = 10;
+  @ApiProperty({ example: 1, required: false })
+  @IsOptional()
+  page: string = '1';
+
+  @ApiProperty({ example: 10, required: false })
+  @IsOptional()
+  limit: string = '10';
+
+  @ApiProperty({ example: 'id', required: false })
+  @IsOptional()
+  @IsString()
   sortBy: string = 'id';
+
+  @ApiProperty({ example: 'desc', required: false })
+  @IsOptional()
+  @IsString()
   sortOrder: 'asc' | 'desc' = 'desc';
+
+  @ApiProperty({ example: 'Customer Name', required: false })
+  @IsOptional()
+  @IsString()
   search?: string;
-  skip?: number;
 }
 
 // Create DTO

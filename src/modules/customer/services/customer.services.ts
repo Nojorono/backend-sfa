@@ -164,13 +164,16 @@ export class CustomerService {
       sortOrder = 'desc',
     } = query;
 
-    const paginationParams: CustomerQueryDto = {
-      page: page ? Number(page) : undefined,
-      limit: limit ? Number(limit) : undefined,
-      sortBy,
-      sortOrder,
-      search,
-      skip: (page - 1) * limit,
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    const paginationParams = {
+      page: page ? pageNumber : undefined,
+      limit: limit ? limitNumber : undefined,
+      sortBy: sortBy,
+      sortOrder: sortOrder,
+      search: search,
+      skip: (pageNumber - 1) * limitNumber,
     };
 
     const where: Prisma.CustomersWhereInput = {
