@@ -27,12 +27,13 @@ export class CustomerSchedulerService implements OnModuleInit {
 
   // Run every daily at 2:00 AM
   @Cron('0 2 * * *')
+  // @Cron('*/2 * * * *')
   async handleTest() {
     const now = new Date();
     const date = now.toISOString().split('T')[0];
     this.logger.log(`[Daily Task] Running at ${now.toISOString()}`);
     const result =
-      await this.customerMetaService.getOracleCustomersByDate(date);
+      await this.customerMetaService.getOracleCustomersByDate('2024-05-21');
     const metaCustomers: MetaCustomerDto[] = result.data;
     if (metaCustomers.length === 0) {
       this.logger.log(`[Daily Task] No data found at ${date}`);

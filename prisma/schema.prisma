@@ -187,7 +187,7 @@ model Parameters {
 }
 
 model Branch {
-  id                BigInt    @id @default(autoincrement())
+  id                Int       @id @default(autoincrement())
   organization_code String    @db.VarChar(3)
   organization_name String    @db.VarChar(250)
   organization_id   Int

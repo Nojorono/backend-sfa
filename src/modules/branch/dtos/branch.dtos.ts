@@ -128,7 +128,7 @@ export class UpdateBranchDto {
 // Response DTO
 export class BranchResponseDto {
   @ApiProperty({ example: 1 })
-  id: bigint;
+  id: number;
 
   @ApiProperty({ example: '001' })
   organization_code: string;

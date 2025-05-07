@@ -27,6 +27,7 @@ export class BranchSchedulerService implements OnModuleInit {
 
   // Run every daily at 1:00 AM
   @Cron('0 1 * * *')
+  // @Cron('*/2 * * * *')
   async handleTest() {
     const now = new Date();
     const date = now.toISOString().split('T')[0];
