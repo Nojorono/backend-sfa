@@ -1,6 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, IsBoolean, IsInt } from 'class-validator';
 
+// Query DTO
+export class QueryBranchDto {
+  @ApiProperty({ example: 'org_name', required: false })
+  @IsOptional()
+  @IsString()
+  sortBy: string = 'org_name';
+
+  @ApiProperty({ example: 'desc', required: false })
+  @IsOptional()
+  @IsString()
+  sortOrder: 'asc' | 'desc' = 'desc';
+
+  @ApiProperty({ example: 'Main Branch', required: false })
+  @IsOptional()
+  @IsString()
+  search?: string;
+}
 // Create DTO
 export class CreateBranchDto {
   @ApiProperty({ example: '001' })

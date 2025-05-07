@@ -42,6 +42,7 @@ export class BranchSchedulerService implements OnModuleInit {
       this.branchService.createOrUpdate(metaBranch);
     });
     this.logger.log(`[Daily Task] Done at ${now.toISOString()}`);
+    return result;
   }
 
   // // Example: Run every 30 minutes

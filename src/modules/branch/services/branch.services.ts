@@ -4,9 +4,11 @@ import {
   CreateBranchDto,
   BranchResponseDto,
   UpdateBranchDto,
+  QueryBranchDto,
 } from '../dtos/branch.dtos';
 import { GenericResponseDto } from 'src/dtos/generic.response.dto';
 import { MetaBranchDto } from '../dtos/meta-branch.dtos';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class BranchService {
@@ -15,44 +17,42 @@ export class BranchService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createOrUpdate(data: MetaBranchDto) {
+    // First try to find existing branch without transaction
+    const branch = await this.prismaService.branch.findFirst({
+      where: {
+        organization_id: data.organization_id,
+        org_id: data.org_id,
+      },
+    });
+
+    const branchData = {
+      organization_code: data.organization_code ?? null,
+      organization_name: data.organization_name ?? null,
+      organization_id: data.organization_id ?? null,
+      org_name: data.org_name ?? null,
+      org_id: data.org_id ?? null,
+      organization_type: data.organization_type ?? null,
+      region_code: data.region_code ?? null,
+      address: data.address ?? null,
+      location_id: data.location_id ?? null,
+      valid_from: data.start_date_active ?? null,
+      valid_to: data.end_date_active ?? null,
+      updated_by: 'system',
+      updated_at: new Date(),
+      created_by: 'system',
+      ...(branch ? {} : { created_at: new Date() }),
+    };
+
     try {
-      return await this.prismaService.$transaction(async (tx) => {
-        // First try to find existing branch
-        const branch = await tx.branch.findFirst({
-          where: {
-            organization_id: data.organization_id,
-            org_id: data.org_id,
-          },
-        });
-
-        const branchData = {
-          organization_code: data.organization_code ?? null,
-          organization_name: data.organization_name ?? null,
-          organization_id: data.organization_id ?? null,
-          org_name: data.org_name ?? null,
-          org_id: data.org_id ?? null,
-          organization_type: data.organization_type ?? null,
-          region_code: data.region_code ?? null,
-          address: data.address ?? null,
-          location_id: data.location_id ?? null,
-          valid_from: data.start_date_active ?? null,
-          valid_to: data.end_date_active ?? null,
-          updated_by: 'system',
-          updated_at: new Date(),
-          created_by: 'system',
-          ...(branch ? {} : { created_at: new Date() }),
-        };
-
-        if (branch) {
-          return await tx.branch.update({
-            data: branchData,
-            where: { id: branch.id },
-          });
-        }
-
-        return await tx.branch.create({
+      if (branch) {
+        return await this.prismaService.branch.update({
           data: branchData,
+          where: { id: branch.id },
         });
+      }
+
+      return await this.prismaService.branch.create({
+        data: branchData,
       });
     } catch (error) {
       this.logger.error('Error in createOrUpdate branch:', error);
@@ -122,10 +122,77 @@ export class BranchService {
     });
   }
 
-  async getBranches(): Promise<BranchResponseDto[]> {
+  async getBranches(query: QueryBranchDto): Promise<BranchResponseDto[]> {
+    // Only build search conditions if search term is provided
+    const where: Prisma.BranchWhereInput = query.search
+      ? {
+          OR: [
+            {
+              organization_code: {
+                contains: query.search,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              organization_name: {
+                contains: query.search,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              org_name: {
+                contains: query.search,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              org_id: { contains: query.search, mode: 'insensitive' as const },
+            },
+            {
+              organization_type: {
+                contains: query.search,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              region_code: {
+                contains: query.search,
+                mode: 'insensitive' as const,
+              },
+            },
+            {
+              address: { contains: query.search, mode: 'insensitive' as const },
+            },
+          ],
+        }
+      : {};
+
+    // Define valid sortable fields
+    const validSortFields = [
+      'organization_code',
+      'organization_name',
+      'organization_id',
+      'org_name',
+      'org_id',
+      'organization_type',
+      'region_code',
+      'location_id',
+      'created_at',
+    ] as const;
+
+    // Sanitize sort field and order
+    const sortField = (validSortFields as readonly string[]).includes(
+      query.sortBy,
+    )
+      ? (query.sortBy as keyof Prisma.BranchOrderByWithRelationInput)
+      : 'org_name';
+
+    const sortOrder = query.sortOrder === 'asc' ? 'asc' : 'desc';
+
     return await this.prismaService.branch.findMany({
+      where,
       orderBy: {
-        created_at: 'asc',
+        [sortField]: sortOrder,
       },
     });
   }

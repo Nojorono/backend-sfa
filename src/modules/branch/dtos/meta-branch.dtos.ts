@@ -1,7 +1,7 @@
 import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class MetaBranchDtoByDate {
-  data: MetaBranchDto[];
+  data?: MetaBranchDto[];
   count: number;
   status: boolean;
   message: string;
