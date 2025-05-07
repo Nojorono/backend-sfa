@@ -1,15 +1,64 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../common/services/prisma.service';
+import { Injectable, Logger } from '@nestjs/common';
+import { PrismaService } from 'src/common/services/prisma.service';
 import {
   CreateBranchDto,
   BranchResponseDto,
   UpdateBranchDto,
 } from '../dtos/branch.dtos';
 import { GenericResponseDto } from 'src/dtos/generic.response.dto';
+import { MetaBranchDto } from '../dtos/meta-branch.dtos';
 
 @Injectable()
 export class BranchService {
+  private readonly logger = new Logger(BranchService.name);
+
   constructor(private readonly prismaService: PrismaService) {}
+
+  async createOrUpdate(data: MetaBranchDto) {
+    try {
+      return await this.prismaService.$transaction(async (tx) => {
+        // First try to find existing branch
+        const branch = await tx.branch.findFirst({
+          where: {
+            organization_id: data.organization_id,
+            org_id: data.org_id,
+          },
+        });
+
+        const branchData = {
+          organization_code: data.organization_code ?? null,
+          organization_name: data.organization_name ?? null,
+          organization_id: data.organization_id ?? null,
+          org_name: data.org_name ?? null,
+          org_id: data.org_id ?? null,
+          organization_type: data.organization_type ?? null,
+          region_code: data.region_code ?? null,
+          address: data.address ?? null,
+          location_id: data.location_id ?? null,
+          valid_from: data.start_date_active ?? null,
+          valid_to: data.end_date_active ?? null,
+          updated_by: 'system',
+          updated_at: new Date(),
+          created_by: 'system',
+          ...(branch ? {} : { created_at: new Date() }),
+        };
+
+        if (branch) {
+          return await tx.branch.update({
+            data: branchData,
+            where: { id: branch.id },
+          });
+        }
+
+        return await tx.branch.create({
+          data: branchData,
+        });
+      });
+    } catch (error) {
+      this.logger.error('Error in createOrUpdate branch:', error);
+      throw error;
+    }
+  }
 
   async updateBranch(
     branchId: number,
@@ -86,23 +135,6 @@ export class BranchService {
       where: { id: branchId },
     });
   }
-
-  //   async softDeleteRoles(roleIds: number[]): Promise<GenericResponseDto> {
-  //     await this.prismaService.roles.updateMany({
-  //       where: {
-  //         id: {
-  //           in: roleIds,
-  //         },
-  //       },
-  //       data: {
-  //         deleted_at: new Date(),
-  //       },
-  //     });
-  //     return {
-  //       status: true,
-  //       message: 'roleDeleted',
-  //     };
-  //   }
 
   async deleteBranches(branchIds: number): Promise<GenericResponseDto> {
     await this.prismaService.branch.delete({

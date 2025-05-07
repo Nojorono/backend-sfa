@@ -3,17 +3,17 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import * as crypto from 'crypto';
-import { CustomerService } from '../services/customer.services';
-import { CustomerIntegrationService } from '../services/customer-integration.service';
-import { MetaCustomerDto } from '../dtos/meta-customer.dto';
+import { BranchService } from '../services/branch.services';
+import { BranchIntegrationService } from '../services/branch-integration.service';
+import { MetaBranchDto } from '../dtos/meta-branch.dtos';
 
 @Injectable()
-export class CustomerSchedulerService implements OnModuleInit {
-  private readonly logger = new Logger(CustomerSchedulerService.name);
+export class BranchSchedulerService implements OnModuleInit {
+  private readonly logger = new Logger(BranchSchedulerService.name);
   constructor(
     private schedulerRegistry: SchedulerRegistry,
-    private customerService: CustomerService,
-    private customerMetaService: CustomerIntegrationService,
+    private branchService: BranchService,
+    private branchMetaService: BranchIntegrationService,
   ) {
     // Ensure crypto is available globally if needed
     if (typeof globalThis.crypto === 'undefined') {
@@ -22,24 +22,23 @@ export class CustomerSchedulerService implements OnModuleInit {
   }
 
   onModuleInit() {
-    this.logger.log('Scheduler customer service initialized');
+    this.logger.log('Scheduler branch service initialized');
   }
 
-  // Run every daily at 2:00 AM
-  @Cron('0 2 * * *')
+  // Run every daily at 1:00 AM
+  @Cron('0 1 * * *')
   async handleTest() {
     const now = new Date();
     const date = now.toISOString().split('T')[0];
     this.logger.log(`[Daily Task] Running at ${now.toISOString()}`);
-    const result =
-      await this.customerMetaService.getOracleCustomersByDate(date);
-    const metaCustomers: MetaCustomerDto[] = result.data;
-    if (metaCustomers.length === 0) {
+    const result = await this.branchMetaService.getOracleBranchesByDate(date);
+    const metaBranches: MetaBranchDto[] = result.data;
+    if (metaBranches.length === 0) {
       this.logger.log(`[Daily Task] No data found at ${date}`);
       return;
     }
-    metaCustomers.forEach((metaCustomer) => {
-      this.customerService.createOrUpdate(metaCustomer);
+    metaBranches.forEach((metaBranch) => {
+      this.branchService.createOrUpdate(metaBranch);
     });
     this.logger.log(`[Daily Task] Done at ${now.toISOString()}`);
   }

@@ -197,8 +197,8 @@ model Branch {
   region_code       String    @db.VarChar(150)
   address           String    @db.Text
   location_id       Int
-  valid_from        DateTime  @db.Date
-  valid_to          DateTime  @db.Date
+  valid_from        DateTime? @db.Date
+  valid_to          DateTime? @db.Date
   is_active         Boolean   @default(true)
   created_by        String    @db.VarChar(25)
   created_at        DateTime  @default(now())

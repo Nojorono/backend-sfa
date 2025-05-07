@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { BranchSchedulerService } from './scheduler/branch.scheduler';
 
 @Module({
   controllers: [BranchController],
@@ -39,7 +40,12 @@ import { ScheduleModule } from '@nestjs/schedule';
     ]),
     ScheduleModule.forRoot(),
   ],
-  providers: [PrismaService, BranchService, BranchIntegrationService],
+  providers: [
+    PrismaService,
+    BranchService,
+    BranchIntegrationService,
+    BranchSchedulerService,
+  ],
   exports: [BranchService, BranchIntegrationService],
 })
 export class BranchModule {}
