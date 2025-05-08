@@ -20,6 +20,7 @@ import { CustomerModule } from 'src/modules/customer/customer.module';
 import { ParameterModule } from 'src/modules/parameter/parameter.module';
 import { BranchModule } from 'src/modules/branch/branch.module';
 import { SchedulerModule } from 'src/common/scheduler/scheduler.module';
+import { RegionModule } from 'src/modules/region/region.module';
 @Module({
   imports: [
     AuthModule,
@@ -31,6 +32,7 @@ import { SchedulerModule } from 'src/common/scheduler/scheduler.module';
     CustomerModule,
     ParameterModule,
     BranchModule,
+    RegionModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     I18nModule.forRoot({
       fallbackLanguage: 'en',

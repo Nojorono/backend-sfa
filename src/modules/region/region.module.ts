@@ -1,28 +1,24 @@
 import { Module } from '@nestjs/common';
-import { PrismaService } from 'src/common/services/prisma.service';
-import { BranchService } from './services/branch.services';
-import { BranchController } from './controllers/branch.controllers';
-import { BranchIntegrationService } from './services/branch-integration.service';
 import { ConfigModule } from '@nestjs/config';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ConfigService } from '@nestjs/config';
-import { ScheduleModule } from '@nestjs/schedule';
-import { BranchSchedulerService } from './scheduler/branch.scheduler';
+import { RegionController } from './controllers/region.controllers';
+import { RegionIntegrationService } from './services/region-integration.service';
 
 @Module({
-  controllers: [BranchController],
+  controllers: [RegionController],
   imports: [
     ConfigModule,
     ClientsModule.registerAsync([
       {
-        name: 'BRANCH_SERVICE',
+        name: 'REGION_SERVICE',
         imports: [ConfigModule],
         inject: [ConfigService],
         useFactory: (configService: ConfigService) => ({
           transport: Transport.RMQ,
           options: {
             urls: [configService.get<string>('rmq.uri')],
-            queue: configService.get<string>('rmq.branch'),
+            queue: configService.get<string>('rmq.region'),
             queueOptions: {
               durable: false,
             },
@@ -38,14 +34,8 @@ import { BranchSchedulerService } from './scheduler/branch.scheduler';
         }),
       },
     ]),
-    ScheduleModule.forRoot(),
   ],
-  providers: [
-    PrismaService,
-    BranchService,
-    BranchIntegrationService,
-    BranchSchedulerService,
-  ],
-  exports: [BranchService, BranchIntegrationService],
+  providers: [RegionIntegrationService],
+  exports: [RegionIntegrationService],
 })
-export class BranchModule {}
+export class RegionModule {}
